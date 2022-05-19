@@ -395,26 +395,30 @@ class MvcCommand extends Command
      * @return [type]      
      */
     protected function sidebar($name){
-        if (strpos($name, '/')) {
-            list($folder,$file) = explode('/', $name);
-            $slug = strtolower($file);
-            $folderSlug = strtolower($folder);
-            $sidebarTemplate = str_replace(
-                ['{{modelName}}','{{Route}}'],
-                [$file,$folderSlug.'.'.$slug],
-                $this->getTemplate('sidebar')
-            );
-            File::append(resource_path('views/layout/admin-sidebar.blade.php'), PHP_EOL.$sidebarTemplate.PHP_EOL);
-            $this->info('Sidebar created successfully.');
+        if (!File::exists(resource_path('views/layout/admin-sidebar.blade.php'))) {
+            $this->error("admin-sidebar.blade.php file not found.");
         }else{
-            $slug = strtolower($name);
-            $sidebarTemplate = str_replace(
-                ['{{modelName}}','{{Route}}'],
-                [$name,$slug],
-                $this->getTemplate('sidebar')
-            );
-            File::append(resource_path('views/layout/admin-sidebar.blade.php'), PHP_EOL.$sidebarTemplate.PHP_EOL);
-            $this->info('Sidebar created successfully.');
+            if (strpos($name, '/')) {
+                list($folder,$file) = explode('/', $name);
+                $slug = strtolower($file);
+                $folderSlug = strtolower($folder);
+                $sidebarTemplate = str_replace(
+                    ['{{modelName}}','{{Route}}'],
+                    [$file,$folderSlug.'.'.$slug],
+                    $this->getTemplate('sidebar')
+                );
+                File::append(resource_path('views/layout/admin-sidebar.blade.php'), PHP_EOL.$sidebarTemplate.PHP_EOL);
+                $this->info('Sidebar created successfully.');
+            }else{
+                $slug = strtolower($name);
+                $sidebarTemplate = str_replace(
+                    ['{{modelName}}','{{Route}}'],
+                    [$name,$slug],
+                    $this->getTemplate('sidebar')
+                );
+                File::append(resource_path('views/layout/admin-sidebar.blade.php'), PHP_EOL.$sidebarTemplate.PHP_EOL);
+                $this->info('Sidebar created successfully.');
+            }
         }
     }
 }
