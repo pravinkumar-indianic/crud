@@ -1,0 +1,121 @@
+@extends('{{userType}}')
+@section('title', __('{{modelNameLowerCase}}.title'))
+@section('breadcrumb')
+    <ol class="breadcrumb float-sm-left">
+        <li class="breadcrumb-item">
+            <a href="{{ route('admin.dashboard') }}">{{__('message.home')}}</a>
+        </li>
+        <li class="breadcrumb-item active">{{ __('{{modelNameLowerCase}}.breadcrumb') }}</li>
+    </ol>
+@endsection
+@section('action')
+    <a href="javascript:void(0)" data-toggle="modal" data-target="#{{modelNameLowerCase}}Model" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ __('{{modelNameLowerCase}}.buttons.add') }}</a>
+@endsection
+@section('content')
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="card datatable-list">
+          <div class="card-header">
+            <div class="row">
+                <div class="col-6"></div>
+                <div class="col-6 dataTable-Head">
+                    <select name="status" id="status" class="form-control select2">
+                        <option value="">Select status</option>
+                        <option value="1">{{__('{{modelNameLowerCase}}.label.active') }}</option>
+                        <option value="1">{{__('{{modelNameLowerCase}}.label.inactive') }}</option>
+                    </select>
+                    <input type="search" class="form-control" id="search" name="search" placeholder="{{__('{{modelNameLowerCase}}.label.name') }}">
+                    <div class="ml-2">
+                        <button type="button" class="btn border" id="download">
+                        Download
+                        </button>
+                    </div>
+                    <div class="d-none border p-2" id="columns">
+                        <div id="fields"></div>
+                        <div id="formate">
+                            <div class="file" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Excel File" data-id="xlsx">
+                                <i class="fas fa-file-excel" style="color: darkgreen;"></i>
+                            </div>
+                            <div class="file" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="PDF File" data-id="pdf">
+                                <i class="fas fa-file-pdf" style="color: red;"></i>
+                            </div>
+                            <div class="file" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="CSV File" data-id="csv">
+                                <i class="fas fa-file-csv" style="color: green;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="card-body">
+              <table id="{{modelNameLowerCase}}Table" class="table">
+                <thead>
+                <tr>
+                  <th>{{__('{{modelNameLowerCase}}.label.name') }}</th>
+                  <th>{{__('{{modelNameLowerCase}}.label.status') }}</th>
+                  <th>{{__('{{modelNameLowerCase}}.label.actions') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+@endsection
+@section('model')
+<div class="modal fade" tabindex="-1" role="dialog" id="{{modelNameLowerCase}}Model">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{__('{{modelNameLowerCase}}.buttons.add')}}</h5>
+            </div>
+            <div class="modal-body">
+                <form id="save{{modelName}}Form">
+                <div class="form-group">
+                    <label for="name">{{modelName}}</label>
+                    <input type="text" name="name" class="form-control" placeholder="{{__('{{modelNameLowerCase}}.placeholder.name')}}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                {{__('message.buttons.submit')}}
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="{{modelNameLowerCase}}EditModel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{__('{{modelNameLowerCase}}.buttons.edit')}}</h5>
+            </div>
+            <div class="modal-body">
+                <form id="update{{modelName}}Form">
+                <div class="form-group">
+                    <label for="name">{{modelName}}</label>
+                    <input type="text" name="name" class="form-control" placeholder="{{__('{{modelNameLowerCase}}.placeholder.name')}}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="id" id="id">
+                <button type="submit" class="btn btn-primary">
+                {{__('message.buttons.update')}}
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script src="{{asset('js/{{Prefix}}{{modelNameLowerCase}}.js')}}"></script>
+@endpush

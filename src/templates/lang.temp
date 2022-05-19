@@ -1,0 +1,35 @@
+<?php
+
+return [
+	'title' => '{{modelName}}',
+	'breadcrumb' => '{{modelName}}',
+	'buttons' => [
+		'add' => 'Add {{modelName}}',
+		'edit' => 'Edit {{modelName}}',
+		'update' => 'Update {{modelName}}',
+		'delete' => 'Delete {{modelName}}',
+	],
+	'label' => [
+		'name' => 'Name',
+		'status' => 'Status',
+		'actions' => 'Actions',
+		'active' => 'Active',
+		'inactive' => 'In-Active',
+	],
+	'table' => [
+		'name' => 'Name',
+	],
+	'placeholder' => [
+		'name' => 'Enter {{modelNameLower}} name',
+	],
+	'success' => [
+		'created' => '{{modelName}} successfully created.',
+		'updated' => '{{modelName}} successfully updated.',
+		'deleted' => '{{modelName}} successfully deleted.',
+		'activated' => '{{modelName}} successfully activated.',
+		'deactivated' => '{{modelName}} successfully deactivated.',
+	],
+	'error' => [
+		 
+	],
+];

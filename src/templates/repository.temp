@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Repositories;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Models\{{modelName}};
+
+class {{modelName}}Repository extends Repository
+{
+	/**
+	 * Constructor function
+	 * @var [type]
+	 */
+	public $model;
+    public function __construct({{modelName}} $model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * This function will save data
+     * @param  [type] $data 
+     * @return [type]       
+     */
+    public function saveData($data){
+    	return $this->model->create([
+            'name' => $data['name'],
+    	]);
+    }
+
+    /**
+     * This function will get all {{modelName}}
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
+    public function getAll{{modelName}}($data){
+        $start = $data['start']??1;
+        $limit = $data['length']??10;
+        $name = $data['name']??'';
+        $status = $data['status']??'';
+        if ($start == '1') {
+            $offset = 0;
+        } else {
+            $offset = ($start - 1) * $limit;
+        }
+        $response = $this->model->select('id','name','status')
+        ->when($name, function($query) use ($name){
+            return $query->where('name','like','%'.$name.'%');
+        })->when($status, function($query) use ($status){
+            return $query->where('status','like','%'.$status.'%');
+        });
+        $totalData = $response->count();
+        $response = $response->offset($offset)->limit($limit)
+        ->get()->toArray();
+        return array(
+            "recordsTotal"    => intval($totalData), 
+            "data"            => $response
+        );
+    }
+
+    /**
+     * This function will return details data
+     * @param  [type] $data 
+     * @return [type]       
+     */
+    public function getDetails($id){
+    	return $this->model->find($id);
+    }
+
+    /**
+     * This function will update data
+     * @param  [type] $data 
+     * @return [type]       
+     */
+    public function updateData($data){
+    	return $this->model->find($data['id'])->update([
+            'name' => $data['name'],
+    	]);
+    }
+
+    /**
+     * This function will delete data
+     * @param  [type] $id 
+     * @return [type]     
+     */
+    public function deleteData($id){
+    	return $this->model->find($id)->delete();
+    }
+
+    /**
+     * This function will update status
+     * @param  [type] $id 
+     * @return [type]     
+     */
+    public function updateStatus($id){
+    	$data = $this->model->find($id);
+    	if ($data->status == {{modelName}}::ACTIVE) {
+    		$data->status = {{modelName}}::INACTIVE;
+            $message = __('{{modelNameLowerCase}}.success.deactivated');
+    	}else{
+    		$data->status = {{modelName}}::ACTIVE;
+            $message = __('{{modelNameLowerCase}}.success.activated');
+    	}
+    	$data->save();
+        return $message;
+    }
+}

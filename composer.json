@@ -1,0 +1,23 @@
+{
+    "name": "pravin/crud",
+    "description": "This will create CRUD",
+    "authors": [
+        {
+            "name": "pravin.kumar",
+            "email": "pravinkumardubey1008@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Pravin\\Crud\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pravin\\Crud\\CRUDServiceProvider"
+            ]
+        }
+    }
+}
