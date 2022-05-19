@@ -51,7 +51,7 @@ class RepositoryCommand extends Command
      */
     protected function getTemplate()
     {
-        return file_get_contents(base_path("vendor/crud/src/templete/repository.temp"));
+        return file_get_contents(base_path("vendor/pravin/crud/src/templates/repository.temp"));
     }
     /**
      * [repository description]

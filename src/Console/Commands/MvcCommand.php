@@ -98,7 +98,7 @@ class MvcCommand extends Command
      */
     protected function getTemplate($type)
     {
-        return file_get_contents(base_path("vendor/crud/src/templete/$type.temp"));
+        return file_get_contents(base_path("vendor/pravin/crud/src/templates/$type.temp"));
     }
 
     /**

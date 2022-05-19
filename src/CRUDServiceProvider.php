@@ -2,7 +2,9 @@
 
 namespace Pravin\Crud;
 use Illuminate\Support\ServiceProvider;
-
+use Pravin\Crud\Console\Commands\MvcCommand;
+use Pravin\Crud\Console\Commands\RepositoryCommand;
+use Pravin\Crud\Console\Commands\ViewCommand;
 /**
  * 
  */
@@ -26,8 +28,10 @@ class CRUDServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-	        __DIR__.'/config/crud.php' => config_path('crud.php')
-	    ]);
+        $this->commands([
+            MvcCommand::class,
+            RepositoryCommand::class,
+            ViewCommand::class,
+        ]);
     }
 }
