@@ -115,6 +115,9 @@ class MvcCommand extends Command
                 [$file],
                 $this->getTemplate('model')
             );
+            if(!file_exists($path = app_path("/Models"))) {
+                mkdir($path, 0777, true);
+            }
             $path = app_path("/Models/{$file}.php");
             if (File::exists($path)) {
                 $this->error("Model already exists.");

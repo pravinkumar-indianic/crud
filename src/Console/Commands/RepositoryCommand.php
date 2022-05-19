@@ -63,6 +63,9 @@ class RepositoryCommand extends Command
             [$this->repository,strtolower($this->repository)],
             $this->getTemplate()
         );
+        if(!file_exists($path = app_path("/Repositories"))) {
+            mkdir($path, 0777, true);
+        }
         $path = app_path("/Repositories/{$this->repository}Repository.php");
         if (File::exists($path)) {
             $this->error("Repository already exists.");
