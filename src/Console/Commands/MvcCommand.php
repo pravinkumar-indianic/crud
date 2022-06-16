@@ -77,12 +77,17 @@ class MvcCommand extends Command
         $this->line('Creating language...');
         sleep(1);
         $this->language($name);
-        $this->line('Creating script...');
-        sleep(1);
-        $this->script($name);
-        $this->line('Creating sidebar...');
-        sleep(1);
-        $this->sidebar($name);
+        if (strpos($name, '/')) {
+            list($folder,$file) = explode('/', $name);
+            if ($folder != 'Api') {
+                $this->line('Creating script...');
+                sleep(1);
+                $this->script($name);
+                $this->line('Creating sidebar...');
+                sleep(1);
+                $this->sidebar($name);
+            }
+        }
         $this->line('
             #########   #########         #    #                 ####### ##        #
             #       #   #       #        # #    #               #   #    # #       #
@@ -300,16 +305,23 @@ class MvcCommand extends Command
         if (strpos($name, '/')) {
             list($folder,$file) = explode('/', $name);
             $templete = 'route';
-            if ($folder == 'Api') {
-                $templete = 'apiroute';
-            }
             $slug = strtolower($file);
             $folderSlug = strtolower($folder);
-            $routeTemplate = str_replace(
-                ['{{modelName}}','{{modelNameLower}}','{{namespace}}','{{modelNameRoute}}'],
-                [$file,$folderSlug.'/'.$slug,",'namespace' => '$folder'",$folderSlug.'.'.$slug],
-                $this->getTemplate($templete)
-            );
+            if ($folder == 'Api') {
+                $templete = 'apiroute';
+                $routeTemplate = str_replace(
+                    ['{{modelName}}','{{modelNameLower}}','{{namespace}}','{{modelNameRoute}}'],
+                    [$file,$slug,",'namespace' => '$folder'",$folderSlug.'.'.$slug],
+                    $this->getTemplate($templete)
+                );
+            }else{
+                $routeTemplate = str_replace(
+                    ['{{modelName}}','{{modelNameLower}}','{{namespace}}','{{modelNameRoute}}'],
+                    [$file,$folderSlug.'/'.$slug,",'namespace' => '$folder'",$folderSlug.'.'.$slug],
+                    $this->getTemplate($templete)
+                );
+            }
+            
             if ($folder == 'Api'){
                 File::append(base_path('routes/api.php'), PHP_EOL.$routeTemplate.PHP_EOL);
             }else{
