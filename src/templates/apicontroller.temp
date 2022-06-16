@@ -1,0 +1,198 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests{{Prefix}}\{{modelName}}CreateRequest;
+use App\Http\Requests{{Prefix}}\{{modelName}}UpdateRequest;
+use App\Models\{{modelName}};
+use App\Repositories\{{modelName}}Repository;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
+
+class {{modelName}}Controller extends Controller
+{
+    /**
+     * @var Repository
+     */
+    protected $reposetory;
+
+    /**
+     * {{modelName}}Controller constructor.
+     * @param {{modelName}} $model
+     */
+    public function __construct({{modelName}} $model)
+    {
+        $this->reposetory = new {{modelName}}Repository($model);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        return view('{{prefixLower}}{{modelNameLower}}');
+    }
+
+    /**
+     * This function will return all data
+     * @param  Request $request [description]
+     * @return [type]           [description]
+     */
+    public function list(Request $request){
+        try {
+            $data = $request->all();
+            $response = $this->reposetory->getAll{{modelName}}($data);
+            return Response::dataTableJson($response,$request['draw']);
+        } catch (Exception $e) {
+            Log::error("{{modelName}}Controller->list->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create({{modelName}}CreateRequest $request)
+    {
+        try {
+            $data = $request->all();
+            DB::beginTransaction();
+            $response = $this->reposetory->saveData($data)->toArray();
+            DB::commit();
+            return Response::successResponse(__('{{modelNameLower}}.success.created'),$response);
+        } catch (\Exception $e) {
+            Log::error("{{modelName}}Controller->create->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        } catch (\Error $e) {
+            Log::error("{{modelName}}Controller->create->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        try {
+            $response = $this->reposetory->getDetails($id)->toArray();
+            return Response::successResponse(__('message.success.data_returned'),$response);
+        } catch (\Exception $e) {
+            Log::error("{{modelName}}Controller->show->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        } catch (\Error $e) {
+            Log::error("{{modelName}}Controller->show->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  {{modelName}}Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update({{modelName}}UpdateRequest $request)
+    {
+        try {
+            $data = $request->all();
+            DB::beginTransaction();
+            $this->reposetory->updateData($data);
+            DB::commit();
+            return Response::successResponse(__('{{modelNameLower}}.success.updated'));
+        } catch (\Exception $e) {
+            Log::error("{{modelName}}Controller->update->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        } catch (\Error $e) {
+            Log::error("{{modelName}}Controller->update->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        try {
+            $this->reposetory->deleteData($id);
+            return Response::successResponse(__('{{modelNameLower}}.success.deleted'));
+        } catch (\Exception $e) {
+            Log::error("{{modelName}}Controller->destroy->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        } catch (\Error $e) {
+            Log::error("{{modelName}}Controller->destroy->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+    /**
+     * Update the status resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateStatus($id)
+    {
+        try {
+            $response = $this->reposetory->updateStatus($id);
+            return Response::successResponse($response);
+        } catch (\Exception $e) {
+            Log::error("{{modelName}}Controller->updateStatus->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        } catch (\Error $e) {
+            Log::error("{{modelName}}Controller->updateStatus->\n" . $e);
+            return Response::errorResponse($e->getMessage());
+        }
+    }
+    /**
+     * This function will download the table data in PDF,CSV,Excel formate
+     * @return [type] [description]
+     */
+    public function download(Request $request)
+    {
+        $data = $request->all();
+        $headers = [
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type'        => 'text/'.$data['file'],
+            'Content-Disposition' => 'attachment; filename={{modelNameLower}}.csv',
+            'Expires'             => '0',
+            'Pragma'              => 'public'
+        ];
+        $select = ['id'];
+        foreach ($data['checked'] as $key => $value) {
+            $select[] = $value;
+        }
+        $status = $data['status'];
+        $list = {{modelName}}::select($select)->when($status, function($query) use ($status){
+            return $query->where('status',$status);
+        })->get()->toArray();
+        if ($request['file'] == 'pdf') {
+            return $list;
+        }
+        # add headers for each column in the CSV download
+        array_unshift($list, array_keys($list[0]));
+
+        $callback = function() use ($list){
+            $FH = fopen('php://output', 'w');
+            foreach ($list as $row) {
+                fputcsv($FH, $row);
+            }
+            fclose($FH);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+}

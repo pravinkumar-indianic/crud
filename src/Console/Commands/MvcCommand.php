@@ -45,9 +45,14 @@ class MvcCommand extends Command
         $this->line('Creating model...');
         sleep(1);
         $this->model($name);
-        $this->line('Creating view...');
-        sleep(1);
-        $this->call('make:view', ['name' => $name]);
+        if (strpos($name, '/')) {
+            list($folder,$file) = explode('/', $name);
+            if ($folder != 'Api') {
+                $this->line('Creating view...');
+                sleep(1);
+                $this->call('make:view', ['name' => $name]);
+            }
+        }
         $this->line('Creating controller...');
         sleep(1);
         $this->controller($name);
@@ -150,19 +155,26 @@ class MvcCommand extends Command
     {
         if (strpos($name, '/')) {
             list($folder,$file) = explode('/', $name);
+            $template = 'controller';
+            $path = app_path("/Http/Controllers/{$folder}");
+            $filePath = app_path("/Http/Controllers/{$folder}/{$file}Controller.php");
+            if ($folder == 'Api') {
+                $template = 'apicontroller';
+                $path = app_path("/Http/Controllers/Api/V1");
+                $filePath = app_path("/Http/Controllers/{$folder}/V1/{$file}Controller.php");
+            }
             $modelTemplate = str_replace(
                 ['{{modelName}}','{{modelNameLower}}','{{Prefix}}','{{prefixLower}}'],
                 [$file,strtolower($file),'\\'.$folder,strtolower($folder).'.'],
-                $this->getTemplate('controller')
+                $this->getTemplate($template)
             );
-            if(!file_exists($path = app_path("/Http/Controllers/{$folder}"))) {
+            if(!file_exists($path)) {
                 mkdir($path, 0777, true);
             }
-            $path = app_path("/Http/Controllers/{$folder}/{$file}Controller.php");
-            if (File::exists($path)) {
+            if (File::exists($filePath)) {
                 $this->error("Controller already exists.");
             }else{
-                file_put_contents($path, $modelTemplate);
+                file_put_contents($filePath, $modelTemplate);
                 $this->info('Controller created successfully.');
             }
         }else{
@@ -287,14 +299,22 @@ class MvcCommand extends Command
     protected function route($name){
         if (strpos($name, '/')) {
             list($folder,$file) = explode('/', $name);
+            $templete = 'route';
+            if ($folder == 'Api') {
+                $templete = 'apiroute';
+            }
             $slug = strtolower($file);
             $folderSlug = strtolower($folder);
             $routeTemplate = str_replace(
                 ['{{modelName}}','{{modelNameLower}}','{{namespace}}','{{modelNameRoute}}'],
                 [$file,$folderSlug.'/'.$slug,",'namespace' => '$folder'",$folderSlug.'.'.$slug],
-                $this->getTemplate('route')
+                $this->getTemplate($templete)
             );
-            File::append(base_path('routes/web.php'), PHP_EOL.$routeTemplate.PHP_EOL);
+            if ($folder == 'Api'){
+                File::append(base_path('routes/api.php'), PHP_EOL.$routeTemplate.PHP_EOL);
+            }else{
+                File::append(base_path('routes/web.php'), PHP_EOL.$routeTemplate.PHP_EOL);
+            }
             $this->info('Route created successfully.');
         }else{
             $slug = strtolower($name);
