@@ -65,6 +65,8 @@ class RepositoryCommand extends Command
         );
         if(!file_exists($path = app_path("/Repositories"))) {
             mkdir($path, 0777, true);
+            file_put_contents(app_path("/Repositories/Repository.php"), file_get_contents(base_path("vendor/pravin/crud/src/templates/Repository.temp")));
+            file_put_contents(app_path("/Repositories/RepositoryInterface.php"), file_get_contents(base_path("vendor/pravin/crud/src/templates/RepositoryInterface.temp")));
         }
         $path = app_path("/Repositories/{$this->repository}Repository.php");
         if (File::exists($path)) {
