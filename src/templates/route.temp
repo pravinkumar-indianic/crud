@@ -1,10 +1,8 @@
-Route::group(['prefix' => '{{modelNameLower}}'{{namespace}}], function () {
-	Route::get('/','{{modelName}}Controller@index')->name('{{modelNameRoute}}');
-	Route::post('create', '{{modelName}}Controller@create')->name('{{modelNameRoute}}.create');
-	Route::post('list', '{{modelName}}Controller@list')->name('{{modelNameRoute}}.list');
-	Route::get('{id}','{{modelName}}Controller@show')->name('{{modelNameRoute}}.edit');
-	Route::post('update','{{modelName}}Controller@update')->name('{{modelNameRoute}}.update');
-	Route::delete('{id}','{{modelName}}Controller@destroy')->name('{{modelNameRoute}}.destroy');
-	Route::get('change-status/{id}', '{{modelName}}Controller@updateStatus')->name('{{modelNameRoute}}.change-status');
-	Route::post('download', '{{modelName}}Controller@download')->name('{{modelNameRoute}}.download');
-});
+Route::get('/',[{{modelName}}Controller::class,'index'])->name('{{modelNameRoute}}');
+Route::post('create',[{{modelName}}Controller::class,'create'])->name('{{modelNameRoute}}.create');
+Route::post('list',[{{modelName}}Controller::class,'list'])->name('{{modelNameRoute}}.list');
+Route::get('{id}',[{{modelName}}Controller::class,'show'])->name('{{modelNameRoute}}.edit');
+Route::post('update',[{{modelName}}Controller::class,'update'])->name('{{modelNameRoute}}.update');
+Route::delete('{id}',[{{modelName}}Controller::class,'destroy'])->name('{{modelNameRoute}}.destroy');
+Route::get('change-status/{id}',[{{modelName}}Controller::class,'updateStatus'])->name('{{modelNameRoute}}.change-status');
+Route::post('download',[{{modelName}}Controller::class,'download'])->name('{{modelNameRoute}}.download');
